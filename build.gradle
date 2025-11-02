@@ -36,9 +36,12 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+
+
+// ======= 개발 =======
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'   // Spring Boot가 자동으로 docker-compose 관리
 //    developmentOnly 'org.springframework.boot:spring-boot-devtools'   // 코드 변경 시 자동 재시작
-    annotationProcessor 'org.projectlombok:lombok'
 
 
 // ======= 테스트 =======
