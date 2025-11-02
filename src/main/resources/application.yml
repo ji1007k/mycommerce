@@ -1,3 +1,6 @@
+# -----------------------------------------------------------------------------
+# 1. 공통 설정 (기본값)
+# -----------------------------------------------------------------------------
 server:
   port: 8090
   tomcat:
@@ -5,11 +8,12 @@ server:
       max: 200        # 최대 요청 처리 스레드
       min-spare: 10   # 최소 유지 스레드
 
-
 spring:
   application:
     name: mycommerce
 
+  profiles:
+    active: dev
 
   datasource:
     # 커넥션 풀 (HikariCP) 설정
@@ -19,3 +23,73 @@ spring:
       connection-timeout: 30000   # 커넥션 대기 시간 30초
       idle-timeout: 600000        # 유휴 커넥션 유지 시간 10분
       max-lifetime: 1800000       # 커넥션 최대 수명 30분
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+
+# -----------------------------------------------------------------------------
+# 2. 개발 프로파일 (dev)
+# -----------------------------------------------------------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:25432/db_ecommerce_dev
+    username: db_pguser
+    password: db_pgpwd
+
+  docker:
+    compose:
+      enabled: true
+      file: ./compose-dev.yaml
+
+
+# -----------------------------------------------------------------------------
+# 3. 테스트 프로파일 (test)
+# -----------------------------------------------------------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:postgresql://localhost:25432/db_ecommerce_dev
+    username: db_pguser
+    password: db_pgpwd
+
+  docker:
+    compose:
+      enabled: true
+      skip:
+        in-tests: false   # Docker Compose 지원 활성화 <-> true (비활성화. 기본)
+
+
+# -----------------------------------------------------------------------------
+# 4. 배포 프로파일 (prod)
+# -----------------------------------------------------------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:postgresql://localhost:25432/db_ecommerce_prod
+    username: db_pguser
+    password: db_pgpwd
+
+  docker:
+    compose:
+      enabled: true
+      file: ./compose.yaml
+

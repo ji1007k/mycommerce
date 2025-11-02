@@ -1,0 +1,32 @@
+services:
+
+# database
+  postgres:
+    image: 'postgres:16'
+    container_name: db_ecommerce_dev
+    environment:
+      - 'POSTGRES_DB=db_ecommerce_dev'
+      - 'POSTGRES_USER=db_pguser'
+      - 'POSTGRES_PASSWORD=db_pgpwd'
+    ports:
+      - '25432:5432'
+    volumes:
+      # Named Volume 사용: spring-boot-docker-compose 호환 + Windows/WSL 경로 문제 해결
+      - dev_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped  # 시스템 재시작 시 자동 시작
+
+  redis:
+    image: 'redis:7-alpine'
+    container_name: redis_ecommerce_dev
+    ports:
+      - '26379:6379'
+    volumes:
+      # Named Volume: spring-boot-docker-compose 자동 실행 지원
+      - dev_redis_data:/data
+    command: redis-server --appendonly yes # AOF 영속화 설정
+    restart: unless-stopped
+
+volumes:
+  # 실제로는 docker compose에서 자동으로 프로젝트명(폴더명)을 접두사로 붙여서 생성됨. mycommerce_dev_postgres_data
+  dev_postgres_data:     # Docker 관리 영역, 개발 시 편의성 우선
+  dev_redis_data:
