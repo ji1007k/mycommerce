@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.7'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.jikim'
+version = '0.0.1-SNAPSHOT'
+description = 'mycommerce'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+// ======= 프로덕션 =======
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.25.2'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'   // Spring Boot가 자동으로 docker-compose 관리
+//    developmentOnly 'org.springframework.boot:spring-boot-devtools'   // 코드 변경 시 자동 재시작
+    annotationProcessor 'org.projectlombok:lombok'
+
+
+// ======= 테스트 =======
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // 테스트에도 Lombok 사용
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+// +) ./gradlew check로 단위&통합테스트 둘 다 실행
+// ./gradlew test
+// 단위 테스트만 실행 (integration 태그 제외)
+test {
+    useJUnitPlatform {
+        excludeTags 'integration'  // 통합 테스트 제외
+    }
+}
+
+// ./gradlew integrationTest
+// @Tag("integration")로 설정된 테스트 클래스만 실행
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform {
+        includeTags 'integration'  // 통합 테스트만
+    }
+    shouldRunAfter test  // test 이후 실행. 단위 테스트 실패 시 통합테스트 의미 없음
+}
