@@ -37,8 +37,8 @@ spring:
       mode: always  # 항상 db 초기화 쿼리 실행 (기본값: embedded. 내장 db만)
       continue-on-error: false # SQL 에러 발생 시 중단
       schema-locations: classpath:db/postgresql/schema.sql
-#      data-locations:
-#        - classpath:db/postgresql/data.sql
+      data-locations:
+        - classpath:db/postgresql/data.sql
 #        - classpath:db/postgresql/data-users.sql
 #        - classpath:db/postgresql/data-products.sql
 
@@ -73,9 +73,26 @@ spring:
       on-profile: test
 
   datasource:
-    url: jdbc:postgresql://localhost:25432/db_ecommerce_dev
-    username: db_pguser
-    password: db_pgpwd
+    driver-class-name: org.h2.Driver
+    # DB_CLOSE_DELAY=-1: 테스트 도중 커넥션 닫힘 방지
+    # MODE=PostgreSQL: 실제 서비스 DB 문법 적용
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: false
+#      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+      open-in-view: false
 
   docker:
     compose:

@@ -40,11 +40,16 @@ docker rmi [이미지명]
 docker volume prune -a
 ```
 
-### 확인 & 접속
+### 확인 & 접속 (WSL)
 ```bash
 # 볼륨 마운트 경로 확인
 docker inspect [컨테이너명] --format='{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
 #docker inspect db_ecommerce_prod --format='{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'
+#docker inspect db_ecommerce_prod | grep -A 10 "Mounts"
+
+# 마운트 볼륨 삭제 (mycommerce로 시작하는 모든 볼륨)
+docker volume ls
+sudo docker volume rm $(sudo docker volume ls -q -f name=mycommerce)
 
 # PostgreSQL 접속
 docker exec -it [컨테이너명] psql -U [유저명] -d [DB명]

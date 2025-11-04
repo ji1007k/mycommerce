@@ -2,7 +2,9 @@ CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100),
     email VARCHAR(100),
-    phone_number CHAR(11),
+    password VARCHAR(200),
+    role VARCHAR(50),
+    phone_number VARCHAR(11),
     provider varchar(50),      -- 'NAVER', 'KAKAO', 'GOOGLE' 등
     provider_id varchar(200),   -- provider가 준 사용자 고유 ID
     created_at TIMESTAMP,
@@ -14,6 +16,8 @@ comment on table users IS '사용자정보';
 comment on column users.id IS 'ID';
 comment on column users.name IS '이름';
 comment on column users.email IS '이메일';
+comment on column users.password IS '비밀번호';
+comment on column users.role IS '권한';
 comment on column users.phone_number IS '연락처';
 COMMENT ON COLUMN users.provider IS '소셜로그인 제공자(NAVER, KAKAO, GOOGLE 등)';
 COMMENT ON COLUMN users.provider_id IS '소셜로그인 ID';
