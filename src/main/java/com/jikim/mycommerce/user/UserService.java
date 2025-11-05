@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 // TODO MapStruct 적용
 /**
@@ -26,4 +27,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public User createUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public User findUserByEmail(String email) {
+//        If a value is present, returns the value, otherwise throws NoSuchElementException
+        return userRepository.findByEmail(email).orElseThrow(); //
+    }
+
+    public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
+        return userRepository.findByProviderAndProviderId(provider, providerId);
+    }
 }

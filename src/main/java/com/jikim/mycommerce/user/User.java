@@ -4,9 +4,7 @@ package com.jikim.mycommerce.user;
 import com.jikim.mycommerce.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * User
@@ -19,7 +17,8 @@ import lombok.Setter;
 @Entity
 @Table(name = "users")
 @RequiredArgsConstructor
-@Getter @Setter
+@Getter @Setter @Builder
+@AllArgsConstructor
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

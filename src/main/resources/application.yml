@@ -13,7 +13,7 @@ spring:
     name: mycommerce
 
   profiles:
-    active: prod
+    active: dev
 
   datasource:
     # 커넥션 풀 (HikariCP) 설정
@@ -39,8 +39,23 @@ spring:
       schema-locations: classpath:db/postgresql/schema.sql
       data-locations:
         - classpath:db/postgresql/data.sql
-#        - classpath:db/postgresql/data-users.sql
-#        - classpath:db/postgresql/data-products.sql
+  #        - classpath:db/postgresql/data-users.sql
+  #        - classpath:db/postgresql/data-products.sql
+
+# === Spring Security ===
+  security:
+    oauth2: # https://github.com/settings/developers
+      client:
+        registration:
+          github:
+            clientId: Ov23liBPNBfQ4bHxKUmW
+            clientSecret: c527f0d0bfb0ce819fab31564fca2672349265ea
+            scope: user:email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          github:
+            user-name-attribute: login
+
 
 
 # -----------------------------------------------------------------------------
@@ -62,7 +77,14 @@ spring:
       enabled: true
       file: ./compose-dev.yaml
 
-
+server:
+  servlet:
+    # 세션 쿠키 설정
+    session:
+      cookie:
+        same-site: lax  # CSRF 보호 + OAuth 허용
+        http-only: true # XSS 방어
+        secure: false   # 개발환경 http 허용 (운영에선 true)
 # -----------------------------------------------------------------------------
 # 3. 테스트 프로파일 (test)
 # -----------------------------------------------------------------------------
@@ -120,3 +142,11 @@ spring:
       enabled: true
       file: ./compose.yaml
 
+server:
+  servlet:
+    # 세션 쿠키 설정
+    session:
+      cookie:
+        same-site: lax  # CSRF 보호 + OAuth 허용
+        http-only: true # XSS 방어
+#        secure: true    # https만 허용
