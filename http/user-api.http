@@ -1,2 +1,33 @@
+######################################################
+# 테스트 시 권한 인증 방법
+#  GitHub 로그인 완료 후, 리디렉션된 페이지에서
+#  개발자 도구(F12) → Application 탭 → Cookies → localhost:8090
+#  JSESSIONID 값 복사해서 사용
+#  설정 파일: http-client.env.json
+######################################################
+
+### 사용자 생성
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "user10",
+  "email": "user10@email.com",
+  "password": "user10pwd",
+  "phoneNumber": "01011113333",
+  "provider": "github",
+  "providerId": "github_123123123"
+}
+
 ### 사용자 목록 조회
-GET http://localhost:8090/api/users
+GET {{baseUrl}}/api/users
+Cookie: JSESSIONID={{session}}
+
+### 이메일로 사용자 조회
+GET {{baseUrl}}/api/users/admin@email.com
+Cookie: JSESSIONID={{session}}
+
+### 로그인한 사용자 조회
+GET {{baseUrl}}/api/users/me
+Cookie: JSESSIONID={{session}}

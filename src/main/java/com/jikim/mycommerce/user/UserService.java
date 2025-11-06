@@ -1,6 +1,7 @@
 package com.jikim.mycommerce.user;
 
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,20 +23,22 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    // 전체 사용자 목록 조회
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
-    }
-
     public User createUser(User user) {
         return userRepository.save(user);
     }
 
-    public User findUserByEmail(String email) {
-//        If a value is present, returns the value, otherwise throws NoSuchElementException
-        return userRepository.findByEmail(email).orElseThrow(); //
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
     }
 
+    public User findUserByEmail(String email) {
+//        If a value is present, returns the value, otherwise throws NoSuchElementException
+        return userRepository.findByEmail(email)
+                // Optional을 내부에서 orElseThrow()로 처리
+                .orElseThrow(() -> new EntityNotFoundException("User not found. Email: " + email));
+    }
+
+    // 소셜 로그인 인증제공자 및 소셜 로그인 ID로 사용자 조회
     public Optional<User> findByProviderAndProviderId(String provider, String providerId) {
         return userRepository.findByProviderAndProviderId(provider, providerId);
     }

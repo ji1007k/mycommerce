@@ -34,6 +34,16 @@ public class UserResponse {
                 .build();
     }
 
+    public static UserResponse from(User user) {
+        return UserResponse.builder()
+                .authenticated(true)
+                .userId(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .build();
+    }
+
     public static UserResponse unauthenticated() {
         return UserResponse.builder()
                 .authenticated(false)

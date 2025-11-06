@@ -11,8 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-// TODO 
-//  - Reqeuest, Response DTO 적용
+// TODO
 //  - 공통 로그, 예외 처리
 /**
  * UserController
@@ -30,20 +29,33 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) throws URISyntaxException {
-        User createdUser = userService.createUser(user);
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) throws URISyntaxException {
+        User createdUser = userService.createUser(userRequest.toEntity());
         // WebConfig에서 /api가 자동 추가되므로 하드코딩된 /api 제거
-        return ResponseEntity.created(new URI("/users/" + createdUser.getId())).build();
+        return ResponseEntity
+                .created(new URI("/users/" + createdUser.getId()))
+                .body(UserResponse.from(createdUser));
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getUsers() {
+    public ResponseEntity<List<UserResponse>> getUsers() {
         try {
             List<User> users = userService.findAllUsers();
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(
+                    users.stream()
+                            .map(UserResponse::from)
+                            .toList());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
+        User foundUser = userService.findUserByEmail(email);
+        return ResponseEntity.ok(
+                UserResponse.from(foundUser)
+        );
     }
 
     @GetMapping("/me")
@@ -55,12 +67,6 @@ public class UserController {
         return ResponseEntity.ok(
                 UserResponse.from(user)
         );
-    }
-
-    @GetMapping("/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User foundUser = userService.findUserByEmail(email);
-        return ResponseEntity.ok(foundUser);
     }
 
 }

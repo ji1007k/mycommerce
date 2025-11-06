@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,7 +36,8 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Profile({"dev", "test"})
+    public SecurityFilterChain devFilterChain(HttpSecurity http) throws Exception {
         http
                 // 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
@@ -77,13 +79,66 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                 )
                 
+                // CSRF 비활성화
+                .csrf(csrf -> csrf.disable())
+        
+                // CORS 설정
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        return http.build();
+    }
+
+    @Bean
+    @Profile("prod")
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                // 접근 권한 설정
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight 허용
+                        .requestMatchers(
+                            "/oauth2/**",
+                            "/login/**",
+                            "/api/csrf"     // WebConfig에서 /api 추가되므로 /api/csrf로 매칭 필요
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+
+                // Security Filter Chain 레벨 예외 처리
+                // Controller 진입 전, 인증 실패 시
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // /logout 요청은 예외 처리 안 함
+                            if (request.getRequestURI().equals("/logout")) {
+                                return;
+                            }
+                            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                        })
+                )
+
+                // 로그인 설정
+                .formLogin(formLogin -> formLogin.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .oauth2Login(oauth2 -> oauth2
+//                        .loginPage("/oauth2/authorization/github")
+                        .defaultSuccessUrl("/", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/") // 로그아웃 후 메인으로
+                        .deleteCookies("JSESSIONID", "XSRF-TOKEN")  // 세션, CSRF 토큰 삭제
+                        .invalidateHttpSession(true)
+                )
+
                 // CSRF 설정
 //                .csrf(csrf -> csrf.disable())
                 .csrf(c -> c
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
                 )
-        
+
                 // CORS 설정
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
