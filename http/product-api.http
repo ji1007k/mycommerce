@@ -1,0 +1,105 @@
+######################################################
+# 상품 API 테스트
+#
+# 주문 테스트 전에 먼저 상품을 생성해야 합니다!
+######################################################
+
+### 1. 상품 생성 (노트북)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "맥북 프로 M3",
+  "description": "Apple Silicon M3 칩 탑재한 최신 맥북 프로",
+  "price": 2500000,
+  "stockQuantity": 10
+}
+
+### 2. 상품 생성 (스마트폰)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "아이폰 15 Pro",
+  "description": "A17 Pro 칩셋, 티타늄 디자인",
+  "price": 1550000,
+  "stockQuantity": 20
+}
+
+### 3. 상품 생성 (태블릿)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "아이패드 Pro 12.9",
+  "description": "M2 칩 탑재, 12.9인치 Liquid Retina XDR 디스플레이",
+  "price": 1800000,
+  "stockQuantity": 15
+}
+
+### 4. 상품 생성 (재고 적은 테스트용)
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "에어팟 프로 2세대",
+  "description": "동시성 테스트용 - 재고 적음",
+  "price": 350000,
+  "stockQuantity": 3
+}
+
+### 5. 모든 상품 조회
+GET {{baseUrl}}/api/products
+Cookie: JSESSIONID={{session}}
+
+### 6. 특정 상품 조회
+GET {{baseUrl}}/api/products/1
+Cookie: JSESSIONID={{session}}
+
+### 7. 상품 수정
+PUT {{baseUrl}}/api/products/1
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "맥북 프로 M3 (할인)",
+  "description": "재고 소진 세일!",
+  "price": 2300000
+}
+
+### 8. 상품 삭제
+DELETE {{baseUrl}}/api/products/1
+Cookie: JSESSIONID={{session}}
+
+
+######################################################
+# Validation 에러 테스트
+######################################################
+
+### 가격이 음수인 경우
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "잘못된 상품",
+  "description": "가격 음수 테스트",
+  "price": -1000,
+  "stockQuantity": 10
+}
+
+### 재고가 음수인 경우
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+Cookie: JSESSIONID={{session}}
+
+{
+  "name": "잘못된 상품",
+  "description": "재고 음수 테스트",
+  "price": 10000,
+  "stockQuantity": -5
+}

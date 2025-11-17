@@ -34,7 +34,8 @@ create table if not exists orders (
     total_price DECIMAL(15, 0) default 0,
     created_at TIMESTAMP,
     updated_at TIMESTAMP,
-    status varchar(20)
+    status varchar(20),
+    version BIGINT DEFAULT 0 NOT NULL
 );
 
 COMMENT ON TABLE orders IS '주문정보';
@@ -44,6 +45,7 @@ COMMENT ON COLUMN orders.total_price IS '총 주문금액';
 COMMENT ON COLUMN orders.created_at IS '생성일시';
 COMMENT ON COLUMN orders.updated_at IS '수정일시';
 COMMENT ON COLUMN orders.status IS '주문상태';
+COMMENT ON COLUMN orders.version IS '버전(낙관적락)';
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 
